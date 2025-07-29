@@ -4,14 +4,18 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import StudentCard from '@/components/StudentCard';
 import StudentForm from '@/components/StudentForm';
-import { LogOut, Plus, Search, Users, GraduationCap } from 'lucide-react';
+import { UserAvatar } from '@/components/UserAvatar';
+import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
   const { students, loading, refreshStudents } = useSupabaseStudents();
+  const { profile } = useUserProfile();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -67,20 +71,42 @@ const Dashboard = () => {
                 <h1 className="text-lg font-bold text-foreground">ÉlèveZen</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="hidden md:block text-sm text-muted-foreground">
-                <strong className="hidden lg:inline">{user?.email}</strong>
-                <strong className="lg:hidden">Connecté</strong>
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="hover:bg-destructive hover:text-destructive-foreground transition-colors"
-              >
-                <LogOut className="w-4 h-4 sm:mr-2" />
-                <span className="hidden sm:inline">Déconnexion</span>
-              </Button>
+            <div className="flex items-center gap-3">
+              {/* User Profile Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-auto p-2 hover:bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <UserAvatar 
+                        avatarUrl={profile?.avatar_url}
+                        displayName={profile?.full_name || profile?.display_name}
+                        email={profile?.email}
+                        size="md"
+                      />
+                      <div className="hidden sm:block text-left">
+                        <p className="text-sm font-medium text-foreground">
+                          {profile?.full_name || profile?.display_name || 'Utilisateur'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {profile?.email}
+                        </p>
+                      </div>
+                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Déconnexion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
