@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
-  const { students, loading } = useSupabaseStudents();
+  const { students, loading, refreshStudents } = useSupabaseStudents();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -161,6 +161,7 @@ const Dashboard = () => {
             onClose={() => setShowAddForm(false)}
             onSuccess={() => {
               setShowAddForm(false);
+              refreshStudents(); // Rafraîchir automatiquement les données
               toast({
                 title: 'Élève ajouté',
                 description: 'Le nouvel élève a été ajouté avec succès.',
