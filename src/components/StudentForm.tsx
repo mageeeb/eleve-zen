@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { Student, SubjectGrades } from '@/types/Student';
 import { X, Save, User } from 'lucide-react';
 
@@ -16,7 +16,7 @@ interface StudentFormProps {
 }
 
 const StudentForm: React.FC<StudentFormProps> = ({ student, onClose, onSuccess }) => {
-  const { addStudent, updateStudent } = useStudents();
+  const { addStudent, updateStudent } = useSupabaseStudents();
   const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -36,7 +36,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onClose, onSuccess }
     try {
       if (student) {
         // Update existing student
-        updateStudent(student.id, formData);
+        await updateStudent(student.id, formData);
       } else {
         // Add new student
         const emptyGrades: SubjectGrades = {
@@ -47,7 +47,7 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onClose, onSuccess }
           bootstrap: []
         };
         
-        addStudent({
+        await addStudent({
           ...formData,
           grades: emptyGrades
         });

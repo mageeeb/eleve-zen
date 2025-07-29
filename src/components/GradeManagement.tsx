@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Student, Subject, SUBJECTS, Grade } from '@/types/Student';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { Plus, Trash2, Save, Calendar } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -15,12 +15,12 @@ interface GradeManagementProps {
 }
 
 const GradeManagement: React.FC<GradeManagementProps> = ({ student }) => {
-  const { addGrade, deleteGrade } = useStudents();
+  const { addGrade, deleteGrade } = useSupabaseStudents();
   const [selectedSubject, setSelectedSubject] = useState<Subject>('javascript');
   const [newGradeValue, setNewGradeValue] = useState<string>('');
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddGrade = () => {
+  const handleAddGrade = async () => {
     const value = parseFloat(newGradeValue);
     
     if (isNaN(value) || value < 0 || value > 20) {
@@ -34,7 +34,7 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student }) => {
 
     setIsAdding(true);
     try {
-      addGrade(student.id, selectedSubject, value);
+      await addGrade(student.id, selectedSubject, value);
       setNewGradeValue('');
       toast({
         title: 'Note ajoutée',
@@ -51,13 +51,21 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student }) => {
     }
   };
 
-  const handleDeleteGrade = (subject: Subject, gradeId: string) => {
+  const handleDeleteGrade = async (subject: Subject, gradeId: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
-      deleteGrade(student.id, subject, gradeId);
-      toast({
-        title: 'Note supprimée',
-        description: 'La note a été supprimée avec succès.',
-      });
+      try {
+        await deleteGrade(student.id, subject, gradeId);
+        toast({
+          title: 'Note supprimée',
+          description: 'La note a été supprimée avec succès.',
+        });
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer la note.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 

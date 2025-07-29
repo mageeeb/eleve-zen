@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import StudentCard from '@/components/StudentCard';
 import StudentForm from '@/components/StudentForm';
 import { LogOut, Plus, Search, Users, GraduationCap } from 'lucide-react';
@@ -11,12 +11,12 @@ import { toast } from '@/hooks/use-toast';
 
 const Dashboard = () => {
   const { logout, user } = useAuth();
-  const { students } = useStudents();
+  const { students, loading } = useSupabaseStudents();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: 'Déconnexion',
       description: 'Vous avez été déconnecté avec succès.',
@@ -66,7 +66,7 @@ const Dashboard = () => {
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">
-                Connecté en tant que <strong>{user?.name}</strong>
+                Connecté en tant que <strong>{user?.email}</strong>
               </span>
               <Button
                 variant="outline"
@@ -123,7 +123,17 @@ const Dashboard = () => {
         </div>
 
         {/* Students Grid */}
-        {filteredStudents.length === 0 ? (
+        {loading ? (
+          <Card className="text-center p-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div>
+                <h3 className="text-lg font-semibold text-foreground">Chargement des élèves...</h3>
+                <p className="text-muted-foreground">Veuillez patienter.</p>
+              </div>
+            </div>
+          </Card>
+        ) : filteredStudents.length === 0 ? (
           <Card className="text-center p-12">
             <div className="flex flex-col items-center gap-4">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center">

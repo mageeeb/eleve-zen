@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Student, Subject, SUBJECTS } from '@/types/Student';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import StudentForm from '@/components/StudentForm';
 import GradeChart from '@/components/GradeChart';
 import GradeManagement from '@/components/GradeManagement';
@@ -18,7 +18,7 @@ interface StudentDetailProps {
 }
 
 const StudentDetail: React.FC<StudentDetailProps> = ({ student, onClose }) => {
-  const { calculateAverage, getGradeColor } = useStudents();
+  const { calculateAverage, getGradeColor } = useSupabaseStudents();
   const [showEditForm, setShowEditForm] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   
