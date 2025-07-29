@@ -46,6 +46,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     }
 
     setUploading(true);
+    
+    console.log('Starting avatar upload for user during signup...');
 
     try {
       // Create preview
@@ -58,6 +60,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
+      console.log('Attempting to upload file:', filePath);
+
       const { data, error } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, {
@@ -66,13 +70,18 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         });
 
       if (error) {
+        console.error('Storage upload error:', error);
         throw error;
       }
+
+      console.log('Upload successful, data:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(data.path);
+
+      console.log('Public URL generated:', publicUrl);
 
       onAvatarChange(publicUrl);
       setPreview(null);
