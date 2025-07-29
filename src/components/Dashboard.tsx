@@ -51,22 +51,26 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-card border-b border-border shadow-soft">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Mobile App Header */}
+      <header className="bg-card border-b border-border shadow-soft sticky top-0 z-50">
+        <div className="px-4 sm:px-6 lg:max-w-7xl lg:mx-auto lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
                 <GraduationCap className="w-6 h-6 text-white" />
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <h1 className="text-xl font-bold text-foreground">Gestion Élèves</h1>
                 <p className="text-sm text-muted-foreground">Administration</p>
               </div>
+              <div className="sm:hidden">
+                <h1 className="text-lg font-bold text-foreground">ÉlèveZen</h1>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                Connecté en tant que <strong>{user?.email}</strong>
+            <div className="flex items-center gap-2">
+              <span className="hidden md:block text-sm text-muted-foreground">
+                <strong className="hidden lg:inline">{user?.email}</strong>
+                <strong className="lg:hidden">Connecté</strong>
               </span>
               <Button
                 variant="outline"
@@ -74,27 +78,27 @@ const Dashboard = () => {
                 onClick={handleLogout}
                 className="hover:bg-destructive hover:text-destructive-foreground transition-colors"
               >
-                <LogOut className="w-4 h-4 mr-2" />
-                Déconnexion
+                <LogOut className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Déconnexion</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <main className="px-4 sm:px-6 lg:max-w-7xl lg:mx-auto lg:px-8 py-4 sm:py-8 pb-20">
+        {/* Mobile Stats Cards */}
+        <div className="grid grid-cols-3 sm:grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
           {statsCards.map((stat, index) => (
-            <Card key={index} className="overflow-hidden border-0 shadow-soft hover:shadow-medium transition-all duration-200">
+            <Card key={index} className="overflow-hidden border-0 shadow-soft hover:shadow-medium transition-all duration-200 sm:hover:scale-[1.02]">
               <CardContent className="p-0">
-                <div className={`${stat.gradient} p-4 text-white`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white/80 text-sm">{stat.title}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
+                <div className={`${stat.gradient} p-3 sm:p-4 text-white rounded-xl sm:rounded-lg`}>
+                  <div className="flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+                    <div className="text-center sm:text-left">
+                      <p className="text-white/80 text-xs sm:text-sm font-medium">{stat.title}</p>
+                      <p className="text-lg sm:text-2xl font-bold">{stat.value}</p>
                     </div>
-                    <stat.icon className="w-8 h-8 text-white/80" />
+                    <stat.icon className="w-5 h-5 sm:w-8 sm:h-8 text-white/80" />
                   </div>
                 </div>
               </CardContent>
@@ -102,22 +106,22 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1 relative">
+        {/* Mobile Controls */}
+        <div className="space-y-4 mb-6">
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Rechercher un élève ou une classe..."
+              placeholder="Rechercher un élève..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-12 rounded-xl border-2 focus:ring-2 focus:ring-primary/20"
             />
           </div>
           <Button
             onClick={() => setShowAddForm(true)}
-            className="bg-gradient-primary hover:opacity-90 transition-all duration-200 transform hover:scale-[1.02]"
+            className="w-full h-12 bg-gradient-primary hover:opacity-90 transition-all duration-200 transform active:scale-[0.98] rounded-xl shadow-lg"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Ajouter un élève
           </Button>
         </div>
@@ -148,7 +152,7 @@ const Dashboard = () => {
             </div>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredStudents.map((student) => (
               <StudentCard key={student.id} student={student} />
             ))}

@@ -44,18 +44,18 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-strong">
-          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white">
+      <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <Card className="w-full sm:max-w-4xl h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-strong rounded-t-3xl sm:rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white sticky top-0 z-10 p-4 sm:p-6">
             <CardTitle className="flex items-center gap-3">
-              <Avatar className="h-12 w-12 ring-2 ring-white/20">
+              <Avatar className="h-12 w-12 sm:h-12 sm:w-12 ring-2 ring-white/20">
                 <AvatarImage src={student.avatar} alt={`${student.firstName} ${student.lastName}`} />
                 <AvatarFallback className="bg-white/20 text-white font-semibold">
                   {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h2 className="text-xl font-bold">
+                <h2 className="text-lg sm:text-xl font-bold">
                   {student.firstName} {student.lastName}
                 </h2>
                 <p className="text-white/80 text-sm">
@@ -63,56 +63,59 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                 </p>
               </div>
             </CardTitle>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowEditForm(true)}
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 h-9 w-9 sm:w-auto"
               >
-                <Edit className="w-4 h-4 mr-2" />
-                Modifier
+                <Edit className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Modifier</span>
               </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={onClose}
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 h-9 w-9"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
           </CardHeader>
           
-          <div className="overflow-y-auto max-h-[calc(90vh-120px)]">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
+          <div className="overflow-y-auto flex-1">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+              <TabsList className="grid w-full grid-cols-3 bg-muted/50 sticky top-0 z-10 mx-0 rounded-none border-b">
+                <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                   <User className="w-4 h-4" />
-                  Vue d'ensemble
+                  <span className="hidden sm:inline">Vue d'ensemble</span>
+                  <span className="sm:hidden">Vue</span>
                 </TabsTrigger>
-                <TabsTrigger value="grades" className="flex items-center gap-2">
+                <TabsTrigger value="grades" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                   <GraduationCap className="w-4 h-4" />
-                  Gestion des notes
+                  <span className="hidden sm:inline">Gestion des notes</span>
+                  <span className="sm:hidden">Notes</span>
                 </TabsTrigger>
-                <TabsTrigger value="stats" className="flex items-center gap-2">
+                <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                   <BarChart3 className="w-4 h-4" />
-                  Statistiques
+                  <span className="hidden sm:inline">Statistiques</span>
+                  <span className="sm:hidden">Stats</span>
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="p-6 space-y-6">
+              <TabsContent value="overview" className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1">
                 {/* General Average */}
-                <Card className="border-0 shadow-soft">
-                  <CardContent className="p-6">
+                <Card className="border-0 shadow-soft rounded-2xl">
+                  <CardContent className="p-4 sm:p-6">
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold mb-2">Moyenne générale</h3>
-                      <div className={`text-4xl font-bold text-${gradeColorClass} mb-2`}>
+                      <h3 className="text-lg font-semibold mb-3 sm:mb-2">Moyenne générale</h3>
+                      <div className={`text-5xl sm:text-4xl font-bold text-${gradeColorClass} mb-3 sm:mb-2`}>
                         {average.toFixed(1)}/20
                       </div>
                       <Badge 
                         variant="outline" 
-                        className={`bg-${gradeColorClass}/10 text-${gradeColorClass} border-${gradeColorClass}/20`}
+                        className={`bg-${gradeColorClass}/10 text-${gradeColorClass} border-${gradeColorClass}/20 rounded-full`}
                       >
                         {average > 10 ? 'Excellent' : average >= 7 ? 'Bien' : 'À améliorer'}
                       </Badge>
@@ -121,27 +124,27 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                 </Card>
 
                 {/* Subject Averages */}
-                <Card className="border-0 shadow-soft">
-                  <CardHeader>
-                    <CardTitle>Moyennes par matière</CardTitle>
+                <Card className="border-0 shadow-soft rounded-2xl">
+                  <CardHeader className="p-4 sm:p-6">
+                    <CardTitle className="text-lg">Moyennes par matière</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <CardContent className="p-4 sm:p-6 pt-0">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-4">
                       {Object.entries(SUBJECTS).map(([subject, name]) => {
                         const subjectAverage = getSubjectAverage(subject as Subject);
                         const subjectColorClass = getGradeColor(subjectAverage);
                         const gradeCount = student.grades[subject as Subject].length;
                         
                         return (
-                          <div key={subject} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div key={subject} className="flex items-center justify-between p-4 sm:p-3 bg-muted/30 rounded-xl sm:rounded-lg">
                             <div>
-                              <p className="font-medium">{name}</p>
+                              <p className="font-medium text-base sm:text-sm">{name}</p>
                               <p className="text-sm text-muted-foreground">
                                 {gradeCount} note{gradeCount > 1 ? 's' : ''}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className={`font-bold text-${subjectColorClass}`}>
+                              <p className={`font-bold text-lg sm:text-base text-${subjectColorClass}`}>
                                 {gradeCount > 0 ? `${subjectAverage.toFixed(1)}/20` : 'N/A'}
                               </p>
                             </div>
@@ -186,11 +189,11 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                 </Card>
               </TabsContent>
 
-              <TabsContent value="grades" className="p-6">
+              <TabsContent value="grades" className="p-4 sm:p-6 flex-1">
                 <GradeManagement student={student} />
               </TabsContent>
 
-              <TabsContent value="stats" className="p-6">
+              <TabsContent value="stats" className="p-4 sm:p-6 flex-1">
                 <GradeChart student={student} />
               </TabsContent>
             </Tabs>
