@@ -13,9 +13,12 @@ interface StudentCardProps {
   student: Student;
 }
 
-const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
-  const { deleteStudent, calculateAverage, getGradeColor } = useSupabaseStudents();
+const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) => {
+  const { deleteStudent, calculateAverage, getGradeColor, getStudentById } = useSupabaseStudents();
   const [showDetail, setShowDetail] = useState(false);
+  
+  // Get the current student data from the hook to ensure real-time updates
+  const student = getStudentById(initialStudent.id) || initialStudent;
   const average = calculateAverage(student);
   const gradeColorClass = getGradeColor(average);
 
