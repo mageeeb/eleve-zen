@@ -2,39 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Educational Management System Design System */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Educational theme colors */
+    --background: 220 20% 97%;
+    --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary: Educational blue */
+    --primary: 217 85% 55%;
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 217 85% 50%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary: Soft educational tone */
+    --secondary: 210 25% 92%;
+    --secondary-foreground: 220 15% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 25% 95%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent: Success green for good grades */
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Grade colors */
+    --grade-excellent: 142 76% 36%; /* Green > 10 */
+    --grade-good: 45 93% 47%; /* Yellow 7-10 */
+    --grade-poor: 0 84% 60%; /* Red < 6 */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 94%;
+    --ring: 217 85% 55%;
+
+    /* Educational gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(217, 85%, 55%), hsl(200, 90%, 65%));
+    --gradient-success: linear-gradient(135deg, hsl(142, 76%, 36%), hsl(120, 70%, 45%));
+    --gradient-warning: linear-gradient(135deg, hsl(45, 93%, 47%), hsl(35, 85%, 55%));
+    --gradient-danger: linear-gradient(135deg, hsl(0, 84%, 60%), hsl(15, 80%, 65%));
+    
+    /* Shadows */
+    --shadow-soft: 0 4px 12px hsl(220, 20%, 80%, 0.15);
+    --shadow-medium: 0 8px 24px hsl(220, 20%, 70%, 0.25);
+    --shadow-strong: 0 16px 48px hsl(220, 30%, 60%, 0.35);
 
     --radius: 0.5rem;
 
