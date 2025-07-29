@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { Student, SubjectGrades } from '@/types/Student';
 import { X, Save, User } from 'lucide-react';
+import AvatarUpload from './AvatarUpload';
 
 interface StudentFormProps {
   student?: Student;
@@ -151,36 +152,11 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onClose, onSuccess }
               </div>
             </div>
 
-            <div>
-              <Label>Avatar</Label>
-              <div className="space-y-3">
-                <Input
-                  placeholder="URL de l'avatar (optionnel)"
-                  value={formData.avatar}
-                  onChange={(e) => handleChange('avatar', e.target.value)}
-                />
-                <div className="grid grid-cols-5 gap-2">
-                  {predefinedAvatars.map((url, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleChange('avatar', url)}
-                      className={`w-12 h-12 rounded-full overflow-hidden border-2 transition-all hover:scale-105 ${
-                        formData.avatar === url 
-                          ? 'border-primary ring-2 ring-primary/20' 
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      <img 
-                        src={url} 
-                        alt={`Avatar ${index + 1}`} 
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <AvatarUpload
+              currentAvatar={formData.avatar}
+              onAvatarChange={(avatarUrl) => handleChange('avatar', avatarUrl)}
+              studentName={`${formData.firstName} ${formData.lastName}`}
+            />
 
             <div>
               <Label htmlFor="adminComments">Commentaires de l'administrateur</Label>
