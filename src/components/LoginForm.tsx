@@ -3,19 +3,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { GraduationCap, Lock, Mail } from 'lucide-react';
+import { GraduationCap, Lock, Mail, User, Upload, Link } from 'lucide-react';
+import AvatarUpload from '@/components/AvatarUpload';
+import TermsDialog from '@/components/TermsDialog';
+import { supabase } from '@/integrations/supabase/client';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const { login, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (mode === 'signup') {
+      if (!fullName.trim()) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez saisir votre nom complet.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!acceptedTerms) {
+        toast({
+          title: "Erreur",
+          description: "Vous devez accepter les conditions d'utilisation.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
     setIsLoading(true);
 
     try {
@@ -31,6 +59,18 @@ const LoginForm = () => {
         });
       } else {
         if (mode === 'signup') {
+          // Update the user profile with name and avatar
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await supabase
+              .from('profiles')
+              .update({
+                full_name: fullName,
+                avatar_url: avatarUrl || null
+              })
+              .eq('id', user.id);
+          }
+          
           toast({
             title: "Inscription réussie",
             description: "Vérifiez votre email pour confirmer votre compte.",
@@ -72,6 +112,38 @@ const LoginForm = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === 'signup' && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Nom complet
+                    </Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Votre nom complet"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <Upload className="w-4 h-4" />
+                      Photo de profil (optionnel)
+                    </Label>
+                    <AvatarUpload
+                      currentAvatar={avatarUrl}
+                      onAvatarChange={setAvatarUrl}
+                      studentName={fullName || "Admin"}
+                    />
+                  </div>
+                </>
+              )}
+              
               <div className="space-y-2">
                 <Label htmlFor="email" className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
@@ -102,6 +174,41 @@ const LoginForm = () => {
                   className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
               </div>
+              
+              {mode === 'signup' && (
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                      className="mt-1"
+                    />
+                    <div className="space-y-1">
+                      <Label
+                        htmlFor="terms"
+                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        J'ai lu et j'accepte les conditions d'utilisation
+                      </Label>
+                      <div>
+                        <TermsDialog>
+                          <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0 text-xs text-primary"
+                          >
+                            <Link className="w-3 h-3 mr-1" />
+                            Afficher les conditions
+                          </Button>
+                        </TermsDialog>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <Button
                 type="submit"
                 className="w-full bg-gradient-primary hover:opacity-90 transition-all duration-200 transform hover:scale-[1.02]"
