@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Student, Subject, SUBJECTS, SUBJECT_COLORS } from '@/types/Student';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 interface GradeChartProps {
@@ -9,7 +9,7 @@ interface GradeChartProps {
 }
 
 const GradeChart: React.FC<GradeChartProps> = ({ student }) => {
-  const { calculateAverage } = useStudents();
+  const { calculateAverage } = useSupabaseStudents();
 
   const getSubjectAverage = (subject: Subject) => {
     const grades = student.grades[subject];

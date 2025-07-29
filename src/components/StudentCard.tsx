@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Student } from '@/types/Student';
-import { useStudents } from '@/hooks/useStudents';
+import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import StudentDetail from '@/components/StudentDetail';
 import { Eye, Edit, Trash2, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -14,7 +14,7 @@ interface StudentCardProps {
 }
 
 const StudentCard: React.FC<StudentCardProps> = ({ student }) => {
-  const { deleteStudent, calculateAverage, getGradeColor } = useStudents();
+  const { deleteStudent, calculateAverage, getGradeColor } = useSupabaseStudents();
   const [showDetail, setShowDetail] = useState(false);
   const average = calculateAverage(student);
   const gradeColorClass = getGradeColor(average);
