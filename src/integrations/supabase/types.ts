@@ -53,6 +53,7 @@ export type Database = {
           nom: string
           prenom: string
           sexe: string | null
+          user_id: string
         }
         Insert: {
           age?: number | null
@@ -63,6 +64,7 @@ export type Database = {
           nom: string
           prenom: string
           sexe?: string | null
+          user_id: string
         }
         Update: {
           age?: number | null
@@ -73,6 +75,7 @@ export type Database = {
           nom?: string
           prenom?: string
           sexe?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -129,6 +132,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           email: string
+          formation: string | null
           full_name: string | null
           id: string
           updated_at: string
@@ -138,6 +142,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email: string
+          formation?: string | null
           full_name?: string | null
           id: string
           updated_at?: string
@@ -147,6 +152,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string
+          formation?: string | null
           full_name?: string | null
           id?: string
           updated_at?: string

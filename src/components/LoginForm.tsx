@@ -15,6 +15,7 @@ const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [formation, setFormation] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,15 @@ const LoginForm = () => {
         toast({
           title: "Erreur",
           description: "Veuillez saisir votre nom complet.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!formation.trim()) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez saisir votre formation.",
           variant: "destructive",
         });
         return;
@@ -66,6 +76,7 @@ const LoginForm = () => {
               .from('profiles')
               .update({
                 full_name: fullName,
+                formation: formation,
                 avatar_url: avatarUrl || null
               })
               .eq('id', user.id);
@@ -125,6 +136,22 @@ const LoginForm = () => {
                       placeholder="Votre nom complet"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      required
+                      className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="formation" className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4" />
+                      Formation
+                    </Label>
+                    <Input
+                      id="formation"
+                      type="text"
+                      placeholder="Ex: Développement Web, Data Science..."
+                      value={formation}
+                      onChange={(e) => setFormation(e.target.value)}
                       required
                       className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     />

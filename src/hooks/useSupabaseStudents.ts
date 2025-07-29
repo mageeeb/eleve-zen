@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useSupabaseStudents = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -99,6 +99,10 @@ export const useSupabaseStudents = () => {
   };
 
   const addStudent = async (studentData: Omit<Student, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!user) {
+      throw new Error('Utilisateur non connecté');
+    }
+
     try {
       const { data, error } = await supabase
         .from('eleves')
@@ -108,7 +112,8 @@ export const useSupabaseStudents = () => {
           age: studentData.age,
           sexe: studentData.gender,
           classe: studentData.className,
-          avatar_url: studentData.avatar
+          avatar_url: studentData.avatar,
+          user_id: user.id
         }])
         .select()
         .single();

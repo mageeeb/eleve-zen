@@ -23,6 +23,7 @@ export const ProfileEdit: React.FC<ProfileEditProps> = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
     full_name: '',
     display_name: '',
+    formation: '',
     avatar_url: ''
   });
 
@@ -31,6 +32,7 @@ export const ProfileEdit: React.FC<ProfileEditProps> = ({ open, onClose }) => {
       setFormData({
         full_name: profile.full_name || '',
         display_name: profile.display_name || '',
+        formation: profile.formation || '',
         avatar_url: profile.avatar_url || ''
       });
     }
@@ -47,6 +49,7 @@ export const ProfileEdit: React.FC<ProfileEditProps> = ({ open, onClose }) => {
         .update({
           full_name: formData.full_name.trim() || null,
           display_name: formData.display_name.trim() || null,
+          formation: formData.formation.trim() || null,
           avatar_url: formData.avatar_url || null,
           updated_at: new Date().toISOString()
         })
@@ -123,6 +126,18 @@ export const ProfileEdit: React.FC<ProfileEditProps> = ({ open, onClose }) => {
                 value={formData.display_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, display_name: e.target.value }))}
                 placeholder="Nom à afficher"
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="formation" className="text-foreground">Formation</Label>
+              <Input
+                id="formation"
+                type="text"
+                value={formData.formation}
+                onChange={(e) => setFormData(prev => ({ ...prev, formation: e.target.value }))}
+                placeholder="Ex: Développement Web, Data Science..."
                 className="mt-1"
               />
             </div>

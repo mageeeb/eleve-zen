@@ -8,6 +8,7 @@ interface UserProfile {
   display_name: string | null;
   avatar_url: string | null;
   full_name: string | null;
+  formation: string | null;
 }
 
 export const useUserProfile = () => {

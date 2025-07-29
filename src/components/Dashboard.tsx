@@ -67,7 +67,9 @@ const Dashboard = () => {
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl font-bold text-foreground">Gestion Élèves</h1>
-                <p className="text-sm text-muted-foreground">Administration</p>
+                <p className="text-sm text-muted-foreground">
+                  {profile?.formation ? `Formation: ${profile.formation}` : 'Administration'}
+                </p>
               </div>
               <div className="sm:hidden">
                 <h1 className="text-lg font-bold text-foreground">ÉlèveZen</h1>
