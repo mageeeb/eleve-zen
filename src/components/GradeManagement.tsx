@@ -15,7 +15,7 @@ interface GradeManagementProps {
 }
 
 const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStudent }) => {
-  const { addGrade, deleteGrade, getStudentById } = useSupabaseStudents();
+  const { addGrade, deleteGrade, getStudentById, updateTrigger } = useSupabaseStudents();
   
   // Get the current student data from the hook to ensure real-time updates
   const student = getStudentById(initialStudent.id) || initialStudent;

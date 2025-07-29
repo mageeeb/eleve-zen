@@ -18,7 +18,7 @@ interface StudentDetailProps {
 }
 
 const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, onClose }) => {
-  const { students, calculateAverage, getGradeColor, getStudentById } = useSupabaseStudents();
+  const { students, calculateAverage, getGradeColor, getStudentById, updateTrigger } = useSupabaseStudents();
   
   // Get the current student data from the hook to ensure real-time updates
   const student = getStudentById(initialStudent.id) || initialStudent;

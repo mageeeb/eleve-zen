@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useSupabaseStudents = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
@@ -250,6 +251,12 @@ export const useSupabaseStudents = () => {
             : student
         )
       );
+      
+      // Forcer la mise à jour des composants
+      setUpdateTrigger(prev => prev + 1);
+      
+      // Retourner la nouvelle note pour confirmation
+      return newGrade;
     } catch (error) {
       console.error('Error in addGrade:', error);
       throw error;
@@ -282,6 +289,11 @@ export const useSupabaseStudents = () => {
             : student
         )
       );
+      
+      // Forcer la mise à jour des composants
+      setUpdateTrigger(prev => prev + 1);
+      
+      return true;
     } catch (error) {
       console.error('Error in deleteGrade:', error);
       throw error;
@@ -289,6 +301,7 @@ export const useSupabaseStudents = () => {
   };
 
   const getStudentById = (id: string) => {
+    // Le updateTrigger force la re-evaluation même si l'objet est le même
     return students.find(student => student.id === id);
   };
 
@@ -319,6 +332,7 @@ export const useSupabaseStudents = () => {
     getStudentById,
     calculateAverage,
     getGradeColor,
-    refreshStudents: fetchStudents
+    refreshStudents: fetchStudents,
+    updateTrigger // Exposer le trigger pour forcer les mises à jour
   };
 };
