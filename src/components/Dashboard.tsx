@@ -8,7 +8,8 @@ import { useUserProfile } from '@/hooks/useUserProfile';
 import StudentCard from '@/components/StudentCard';
 import StudentForm from '@/components/StudentForm';
 import { UserAvatar } from '@/components/UserAvatar';
-import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown } from 'lucide-react';
+import { ProfileEdit } from '@/components/ProfileEdit';
+import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const { profile } = useUserProfile();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -87,16 +89,21 @@ const Dashboard = () => {
                         <p className="text-sm font-medium text-foreground">
                           {profile?.full_name || profile?.display_name || 'Utilisateur'}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          {profile?.email}
-                        </p>
                       </div>
                       <ChevronDown className="w-4 h-4 text-muted-foreground" />
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 bg-card border border-border shadow-lg z-50">
                   <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => setShowProfileEdit(true)}
+                    className="cursor-pointer"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Modifier le profil
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleLogout}
@@ -197,6 +204,14 @@ const Dashboard = () => {
                 description: 'Le nouvel élève a été ajouté avec succès.',
               });
             }}
+          />
+        )}
+
+        {/* Profile Edit Modal */}
+        {showProfileEdit && (
+          <ProfileEdit
+            open={showProfileEdit}
+            onClose={() => setShowProfileEdit(false)}
           />
         )}
       </main>
