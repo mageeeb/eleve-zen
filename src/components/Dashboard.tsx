@@ -72,7 +72,7 @@ const Dashboard = () => {
                 </p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-foreground">ÉlèveZen</h1>
+                <h1 className="text-lg font-bold text-foreground">Gestion</h1>
               </div>
             </div>
             <div className="flex items-center gap-3">

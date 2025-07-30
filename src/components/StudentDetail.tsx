@@ -45,8 +45,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
   return (
     <>
       <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-        <Card className="w-full sm:max-w-4xl h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-strong rounded-t-3xl sm:rounded-2xl">
-          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white sticky top-0 z-10 p-4 sm:p-6">
+        <Card className="w-full sm:max-w-4xl h-[100vh] sm:h-auto sm:max-h-[90vh] overflow-hidden shadow-strong rounded-none sm:rounded-2xl">
+          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white sticky top-0 z-10 p-3 sm:p-6 pb-4 sm:pb-6">
             <CardTitle className="flex items-center gap-3">
               <Avatar className="h-12 w-12 sm:h-12 sm:w-12 ring-2 ring-white/20">
                 <AvatarImage src={student.avatar} alt={`${student.firstName} ${student.lastName}`} />
@@ -86,19 +86,19 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
           
           <div className="overflow-y-auto flex-1">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-3 bg-muted/50 sticky top-0 z-10 mx-0 rounded-none border-b">
-                <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <User className="w-4 h-4" />
+              <TabsList className="grid w-full grid-cols-3 bg-muted/50 sticky top-0 z-10 mx-0 rounded-none border-b p-1">
+                <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Vue d'ensemble</span>
                   <span className="sm:hidden">Vue</span>
                 </TabsTrigger>
-                <TabsTrigger value="grades" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <GraduationCap className="w-4 h-4" />
+                <TabsTrigger value="grades" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                  <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Gestion des notes</span>
                   <span className="sm:hidden">Notes</span>
                 </TabsTrigger>
-                <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                  <BarChart3 className="w-4 h-4" />
+                <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">Statistiques</span>
                   <span className="sm:hidden">Stats</span>
                 </TabsTrigger>
