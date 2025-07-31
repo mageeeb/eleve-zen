@@ -131,8 +131,7 @@ export const useAdminRequest = () => {
       // Ajouter le rôle admin à l'utilisateur
       const { error: roleError } = await supabase
         .from('user_roles')
-        .update({ role: 'admin' })
-        .eq('user_id', user.id);
+        .upsert({ user_id: user.id, role: 'admin' });
 
       if (roleError) {
         throw roleError;
