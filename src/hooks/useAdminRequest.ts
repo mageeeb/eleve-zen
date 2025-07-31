@@ -128,10 +128,11 @@ export const useAdminRequest = () => {
         throw new Error('Le code de validation a expiré');
       }
 
-      // Ajouter le rôle admin à l'utilisateur
+      // Mettre à jour le rôle de l'utilisateur vers admin
       const { error: roleError } = await supabase
         .from('user_roles')
-        .upsert({ user_id: user.id, role: 'admin' });
+        .update({ role: 'admin' })
+        .eq('user_id', user.id);
 
       if (roleError) {
         throw roleError;
