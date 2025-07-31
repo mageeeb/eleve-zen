@@ -218,6 +218,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_admin_request: {
+        Args: { request_id: string }
+        Returns: Json
+      }
       generate_validation_code: {
         Args: Record<PropertyKey, never>
         Returns: string
