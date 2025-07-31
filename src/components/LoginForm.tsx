@@ -4,9 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { GraduationCap, Lock, Mail, User, Upload, Link } from 'lucide-react';
+import { GraduationCap, Lock, Mail, User, Upload, Link, Shield, UserCircle } from 'lucide-react';
 import AvatarUpload from '@/components/AvatarUpload';
 import TermsDialog from '@/components/TermsDialog';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +21,7 @@ const LoginForm = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [requestedRole, setRequestedRole] = useState<'user' | 'admin'>('user');
   const { login, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,6 +82,34 @@ const LoginForm = () => {
                 avatar_url: avatarUrl || null
               })
               .eq('id', user.id);
+
+            // Si l'utilisateur demande le rôle admin, créer une demande
+            if (requestedRole === 'admin') {
+              try {
+                const { data: requestData, error: requestError } = await supabase
+                  .from('admin_requests')
+                  .insert({
+                    user_id: user.id,
+                    email: user.email || '',
+                    status: 'pending'
+                  })
+                  .select()
+                  .single();
+
+                if (!requestError) {
+                  // Envoyer la notification d'admin
+                  await supabase.functions.invoke('send-admin-notification', {
+                    body: {
+                      userEmail: user.email,
+                      userName: fullName,
+                      requestId: requestData.id
+                    }
+                  });
+                }
+              } catch (adminRequestError) {
+                console.error('Erreur lors de la demande admin:', adminRequestError);
+              }
+            }
           }
           
           toast({
@@ -157,17 +187,48 @@ const LoginForm = () => {
                     />
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <Upload className="w-4 h-4" />
-                      Photo de profil (optionnel)
-                    </Label>
-                    <AvatarUpload
-                      currentAvatar={avatarUrl}
-                      onAvatarChange={setAvatarUrl}
-                      studentName={fullName || "Admin"}
-                    />
-                  </div>
+                   <div className="space-y-2">
+                     <Label className="flex items-center gap-2">
+                       <Shield className="w-4 h-4" />
+                       Type de compte
+                     </Label>
+                     <Select value={requestedRole} onValueChange={(value: 'user' | 'admin') => setRequestedRole(value)}>
+                       <SelectTrigger className="w-full">
+                         <SelectValue placeholder="Choisissez votre type de compte" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         <SelectItem value="user">
+                           <div className="flex items-center gap-2">
+                             <UserCircle className="w-4 h-4" />
+                             <span>Utilisateur (consultation seule)</span>
+                           </div>
+                         </SelectItem>
+                         <SelectItem value="admin">
+                           <div className="flex items-center gap-2">
+                             <Shield className="w-4 h-4" />
+                             <span>Administrateur (gestion complète)</span>
+                           </div>
+                         </SelectItem>
+                       </SelectContent>
+                     </Select>
+                     {requestedRole === 'admin' && (
+                       <p className="text-xs text-muted-foreground bg-yellow-50 dark:bg-yellow-950/20 p-2 rounded">
+                         ⚠️ Les demandes d'administration doivent être approuvées. Vous recevrez un code par email.
+                       </p>
+                     )}
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <Label className="flex items-center gap-2">
+                       <Upload className="w-4 h-4" />
+                       Photo de profil (optionnel)
+                     </Label>
+                     <AvatarUpload
+                       currentAvatar={avatarUrl}
+                       onAvatarChange={setAvatarUrl}
+                       studentName={fullName || "Admin"}
+                     />
+                   </div>
                 </>
               )}
               

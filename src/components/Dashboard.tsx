@@ -5,11 +5,13 @@ import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUserRole } from '@/hooks/useUserRole';
 import StudentCard from '@/components/StudentCard';
 import StudentForm from '@/components/StudentForm';
 import { UserAvatar } from '@/components/UserAvatar';
 import { ProfileEdit } from '@/components/ProfileEdit';
-import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown, User } from 'lucide-react';
+import AdminValidation from '@/components/AdminValidation';
+import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown, User, Shield } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -17,9 +19,11 @@ const Dashboard = () => {
   const { logout, user } = useAuth();
   const { students, loading, refreshStudents } = useSupabaseStudents();
   const { profile } = useUserProfile();
+  const { isAdmin, isUser } = useUserRole();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showAdminValidation, setShowAdminValidation] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -106,6 +110,15 @@ const Dashboard = () => {
                     <User className="w-4 h-4 mr-2" />
                     Modifier le profil
                   </DropdownMenuItem>
+                  {!isAdmin && (
+                    <DropdownMenuItem 
+                      onClick={() => setShowAdminValidation(true)}
+                      className="cursor-pointer text-orange-600 focus:text-orange-700"
+                    >
+                      <Shield className="w-4 h-4 mr-2" />
+                      Devenir admin
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
                     onClick={handleLogout}
@@ -152,13 +165,22 @@ const Dashboard = () => {
               className="pl-10 h-12 rounded-xl border-2 focus:ring-2 focus:ring-primary/20"
             />
           </div>
-          <Button
-            onClick={() => setShowAddForm(true)}
-            className="w-full h-12 bg-gradient-primary hover:opacity-90 transition-all duration-200 transform active:scale-[0.98] rounded-xl shadow-lg"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            Ajouter un élève
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={() => setShowAddForm(true)}
+              className="w-full h-12 bg-gradient-primary hover:opacity-90 transition-all duration-200 transform active:scale-[0.98] rounded-xl shadow-lg"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Ajouter un élève
+            </Button>
+          )}
+          {isUser && (
+            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+              <p className="text-sm text-blue-800 dark:text-blue-200 text-center">
+                👁️ <strong>Mode consultation :</strong> Vous pouvez consulter les informations mais ne pouvez pas les modifier.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Students Grid */}
@@ -195,7 +217,7 @@ const Dashboard = () => {
         )}
 
         {/* Add Student Form Modal */}
-        {showAddForm && (
+        {showAddForm && isAdmin && (
           <StudentForm
             onClose={() => setShowAddForm(false)}
             onSuccess={() => {
@@ -215,6 +237,23 @@ const Dashboard = () => {
             open={showProfileEdit}
             onClose={() => setShowProfileEdit(false)}
           />
+        )}
+
+        {/* Admin Validation Modal */}
+        {showAdminValidation && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="relative">
+              <AdminValidation />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdminValidation(false)}
+                className="absolute -top-2 -right-2 bg-white rounded-full w-8 h-8 p-0 shadow-md hover:bg-gray-100"
+              >
+                ✕
+              </Button>
+            </div>
+          </div>
         )}
       </main>
     </div>
