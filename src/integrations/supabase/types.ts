@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_requests: {
+        Row: {
+          code_expires_at: string | null
+          created_at: string
+          email: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+          validation_code: string | null
+        }
+        Insert: {
+          code_expires_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          validation_code?: string | null
+        }
+        Update: {
+          code_expires_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validation_code?: string | null
+        }
+        Relationships: []
+      }
       commentaires: {
         Row: {
           contenu: string
@@ -185,6 +218,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_validation_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_role: {
         Args: {
           _user_id: string
