@@ -1,0 +1,27 @@
+{
+  "name": "Gestion Élèves - Interface d'Administration", 
+  "short_name": "Gestion Élèves",
+  "description": "Application web complète pour la gestion des élèves avec suivi des notes, statistiques et interface d'administration moderne.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["education", "productivity"],
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/lovable-uploads/a01b6548-d8b2-4649-9460-d3e415553c62.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/a01b6548-d8b2-4649-9460-d3e415553c62.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
