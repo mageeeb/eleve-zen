@@ -208,14 +208,19 @@ export const useSupabaseStudents = () => {
       console.log('🔑 Is admin:', adminCheck, 'Admin error:', adminError);
       
       // Debug: Check student ownership
+      console.log('🔍 Recherche des données de l\'élève...');
       const { data: studentData, error: studentError } = await supabase
         .from('eleves')
         .select('user_id')
         .eq('id', id)
         .single();
-      console.log('👨‍🎓 Student data:', studentData, 'Student error:', studentError);
+        
+      console.log('👨‍🎓 Student data:', studentData);
+      console.log('⚠️ Student error:', studentError);
       console.log('🔄 Student user_id:', studentData?.user_id, 'Current user_id:', user?.id);
       
+      // Procéder à la suppression directement
+      console.log('⏭️ Procédure de suppression...');
       const { error } = await supabase
         .from('eleves')
         .delete()
@@ -229,6 +234,7 @@ export const useSupabaseStudents = () => {
       console.log('✅ Student deleted successfully from database');
       
       // Force refresh from database instead of just updating local state
+      console.log('🔄 Rafraîchissement de la liste...');
       await fetchStudents();
       console.log('🔄 Refreshed students list from database');
       
