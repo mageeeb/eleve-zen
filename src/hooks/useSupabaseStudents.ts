@@ -197,15 +197,15 @@ export const useSupabaseStudents = () => {
 
   const deleteStudent = async (id: string) => {
     try {
-      console.log('Attempting to delete student:', id);
+      console.log('🗑️ Attempting to delete student:', id);
       
       // Debug: Check current user and admin status
       const { data: { user } } = await supabase.auth.getUser();
-      console.log('Current user:', user?.id);
+      console.log('👤 Current user:', user?.id);
       
       const { data: adminCheck, error: adminError } = await supabase
         .rpc('is_admin');
-      console.log('Is admin:', adminCheck, 'Admin error:', adminError);
+      console.log('🔑 Is admin:', adminCheck, 'Admin error:', adminError);
       
       // Debug: Check student ownership
       const { data: studentData, error: studentError } = await supabase
@@ -213,8 +213,8 @@ export const useSupabaseStudents = () => {
         .select('user_id')
         .eq('id', id)
         .single();
-      console.log('Student data:', studentData, 'Student error:', studentError);
-      console.log('Student user_id:', studentData?.user_id, 'Current user_id:', user?.id);
+      console.log('👨‍🎓 Student data:', studentData, 'Student error:', studentError);
+      console.log('🔄 Student user_id:', studentData?.user_id, 'Current user_id:', user?.id);
       
       const { error } = await supabase
         .from('eleves')
@@ -222,14 +222,18 @@ export const useSupabaseStudents = () => {
         .eq('id', id);
 
       if (error) {
-        console.error('Error deleting student:', error);
+        console.error('❌ Error deleting student:', error);
         throw error;
       }
 
-      console.log('Student deleted successfully');
-      setStudents(prev => prev.filter(student => student.id !== id));
+      console.log('✅ Student deleted successfully from database');
+      
+      // Force refresh from database instead of just updating local state
+      await fetchStudents();
+      console.log('🔄 Refreshed students list from database');
+      
     } catch (error) {
-      console.error('Error in deleteStudent:', error);
+      console.error('💥 Error in deleteStudent:', error);
       throw error;
     }
   };
