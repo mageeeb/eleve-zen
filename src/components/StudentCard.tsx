@@ -23,21 +23,26 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
   const gradeColorClass = getGradeColor(average);
 
   const handleDelete = async () => {
+    console.log('🚀 DEBUT handleDelete');
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`)) {
       try {
+        console.log('📝 Confirmation reçue, appel deleteStudent...');
         await deleteStudent(student.id);
+        console.log('✅ deleteStudent terminé avec succès');
         toast({
           title: 'Élève supprimé',
           description: `${student.firstName} ${student.lastName} a été supprimé avec succès.`,
         });
       } catch (error) {
-        console.error('Delete error:', error);
+        console.error('❌ Delete error:', error);
         toast({
           title: 'Erreur',
           description: 'Impossible de supprimer l\'élève. Vérifiez vos permissions.',
           variant: 'destructive'
         });
       }
+    } else {
+      console.log('❌ Suppression annulée par l\'utilisateur');
     }
   };
 
@@ -134,7 +139,11 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleDelete}
+                onClick={() => {
+                  console.log('🔥 BOUTON CLIQUÉ !');
+                  alert('Bouton de suppression cliqué !');
+                  handleDelete();
+                }}
                 className="hover:bg-destructive hover:text-destructive-foreground transition-all h-10 sm:h-9 w-12 sm:w-auto rounded-xl shadow-sm"
               >
                 <Trash2 className="w-4 h-4" />
