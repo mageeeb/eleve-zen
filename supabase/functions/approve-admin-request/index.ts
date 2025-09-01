@@ -34,17 +34,12 @@ const handler = async (req: Request): Promise<Response> => {
     
     console.log("Approving admin request:", requestId);
 
-    // Générer un code de validation
-    const { data: codeData, error: codeError } = await supabase
-      .rpc('generate_validation_code');
-
-    if (codeError) {
-      throw new Error(`Failed to generate validation code: ${codeError.message}`);
-    }
-
-    const validationCode = codeData;
+    // Générer un code de validation simple
+    const validationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 24); // Code valide 24h
+
+    console.log("Generated validation code:", validationCode);
 
     // Mettre à jour la demande avec le code et l'expiration
     const { data: updateData, error: updateError } = await supabase
@@ -59,24 +54,34 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (updateError) {
+      console.error("Update error:", updateError);
       throw new Error(`Failed to update admin request: ${updateError.message}`);
     }
 
-    // Envoyer le code de validation par email
-    const sendCodeResponse = await fetch('https://cfvuitpoiymeqblmlijy.supabase.co/functions/v1/send-validation-code', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userEmail: updateData.email,
-        userName: updateData.email,
-        validationCode: validationCode
-      })
-    });
+    console.log("Admin request updated:", updateData);
 
-    if (!sendCodeResponse.ok) {
-      console.error('Failed to send validation code email');
+    // Envoyer le code de validation par email
+    try {
+      const sendCodeResponse = await fetch('https://cfvuitpoiymeqblmlijy.supabase.co/functions/v1/send-validation-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userEmail: updateData.email,
+          userName: updateData.email,
+          validationCode: validationCode
+        })
+      });
+
+      if (!sendCodeResponse.ok) {
+        console.error('Failed to send validation code email, status:', sendCodeResponse.status);
+      } else {
+        console.log('Validation code email sent successfully');
+      }
+    } catch (emailError) {
+      console.error('Error sending email:', emailError);
+      // Ne pas faire échouer toute la fonction si l'email échoue
     }
 
     console.log("Admin request approved and code sent:", updateData);
