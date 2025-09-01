@@ -22,13 +22,22 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
   const average = calculateAverage(student);
   const gradeColorClass = getGradeColor(average);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${student.firstName} ${student.lastName} ?`)) {
-      deleteStudent(student.id);
-      toast({
-        title: 'Élève supprimé',
-        description: `${student.firstName} ${student.lastName} a été supprimé avec succès.`,
-      });
+      try {
+        await deleteStudent(student.id);
+        toast({
+          title: 'Élève supprimé',
+          description: `${student.firstName} ${student.lastName} a été supprimé avec succès.`,
+        });
+      } catch (error) {
+        console.error('Delete error:', error);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer l\'élève. Vérifiez vos permissions.',
+          variant: 'destructive'
+        });
+      }
     }
   };
 

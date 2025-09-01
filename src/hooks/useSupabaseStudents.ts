@@ -197,6 +197,25 @@ export const useSupabaseStudents = () => {
 
   const deleteStudent = async (id: string) => {
     try {
+      console.log('Attempting to delete student:', id);
+      
+      // Debug: Check current user and admin status
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user?.id);
+      
+      const { data: adminCheck, error: adminError } = await supabase
+        .rpc('is_admin');
+      console.log('Is admin:', adminCheck, 'Admin error:', adminError);
+      
+      // Debug: Check student ownership
+      const { data: studentData, error: studentError } = await supabase
+        .from('eleves')
+        .select('user_id')
+        .eq('id', id)
+        .single();
+      console.log('Student data:', studentData, 'Student error:', studentError);
+      console.log('Student user_id:', studentData?.user_id, 'Current user_id:', user?.id);
+      
       const { error } = await supabase
         .from('eleves')
         .delete()
@@ -207,6 +226,7 @@ export const useSupabaseStudents = () => {
         throw error;
       }
 
+      console.log('Student deleted successfully');
       setStudents(prev => prev.filter(student => student.id !== id));
     } catch (error) {
       console.error('Error in deleteStudent:', error);
