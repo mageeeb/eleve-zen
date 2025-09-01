@@ -317,7 +317,7 @@ export const useSupabaseStudents = () => {
 
   const getGradeColor = (average: number): string => {
     if (average > 10) return 'grade-excellent';
-    if (average >= 7) return 'grade-good';
+    if (average > 5) return 'grade-good';
     return 'grade-poor';
   };
 

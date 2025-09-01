@@ -100,7 +100,10 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowDetail(true)}
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setShowDetail(true);
+                }}
                 className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all h-10 sm:h-9 rounded-xl font-medium shadow-sm"
               >
                 <Eye className="w-4 h-4 mr-2 sm:mr-1" />

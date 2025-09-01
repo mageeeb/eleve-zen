@@ -34,8 +34,8 @@
 
     /* Grade colors */
     --grade-excellent: 142 76% 36%; /* Green > 10 */
-    --grade-good: 45 93% 47%; /* Yellow 7-10 */
-    --grade-poor: 0 84% 60%; /* Red < 6 */
+    --grade-good: 25 95% 53%; /* Orange 5-10 */
+    --grade-poor: 0 84% 60%; /* Red ≤ 5 */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;

@@ -164,7 +164,7 @@ const GradeChart: React.FC<GradeChartProps> = ({ student }) => {
                   <div className="text-right">
                     <span className={`font-bold text-lg ${
                       item.value > 10 ? 'text-grade-excellent' : 
-                      item.value >= 7 ? 'text-grade-good' : 'text-grade-poor'
+                      item.value > 5 ? 'text-grade-good' : 'text-grade-poor'
                     }`}>
                       {item.value}/20
                     </span>
@@ -200,7 +200,7 @@ const GradeChart: React.FC<GradeChartProps> = ({ student }) => {
           <CardContent className="p-4">
             <p className={`text-2xl font-bold ${
               calculateAverage(student) > 10 ? 'text-grade-excellent' : 
-              calculateAverage(student) >= 7 ? 'text-grade-good' : 'text-grade-poor'
+              calculateAverage(student) > 5 ? 'text-grade-good' : 'text-grade-poor'
             }`}>
               {calculateAverage(student).toFixed(1)}/20
             </p>
