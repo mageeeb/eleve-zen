@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Student, Subject, SUBJECTS, Grade } from '@/types/Student';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
-import { Plus, Trash2, Save, Calendar } from 'lucide-react';
+import { useSubjectComments } from '@/hooks/useSubjectComments';
+import { Plus, Trash2, Save, Calendar, MessageCircle, Edit2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface GradeManagementProps {
@@ -16,12 +18,17 @@ interface GradeManagementProps {
 
 const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStudent }) => {
   const { addGrade, deleteGrade, getStudentById, updateTrigger } = useSupabaseStudents();
+  const { addComment, updateComment, deleteComment, getCommentsBySubject, loading: commentsLoading } = useSubjectComments(initialStudent.id);
   
   // Get the current student data from the hook to ensure real-time updates
   const student = getStudentById(initialStudent.id) || initialStudent;
   const [selectedSubject, setSelectedSubject] = useState<Subject>('javascript');
   const [newGradeValue, setNewGradeValue] = useState<string>('');
   const [isAdding, setIsAdding] = useState(false);
+  const [newComment, setNewComment] = useState<string>('');
+  const [isAddingComment, setIsAddingComment] = useState(false);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState<string>('');
 
   const handleAddGrade = async () => {
     const value = parseFloat(newGradeValue);
@@ -88,6 +95,92 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
     return new Date(dateString).toLocaleDateString('fr-FR');
   };
 
+  const handleAddComment = async (subject: Subject) => {
+    if (!newComment.trim()) {
+      toast({
+        title: 'Erreur',
+        description: 'Veuillez entrer un commentaire.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsAddingComment(true);
+    try {
+      const result = await addComment(subject, newComment.trim());
+      if (result.success) {
+        setNewComment('');
+        toast({
+          title: 'Commentaire ajouté',
+          description: `Commentaire ajouté pour ${SUBJECTS[subject]}.`,
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'ajouter le commentaire.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsAddingComment(false);
+    }
+  };
+
+  const handleUpdateComment = async (commentId: string) => {
+    if (!editCommentText.trim()) {
+      toast({
+        title: 'Erreur',
+        description: 'Veuillez entrer un commentaire.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const result = await updateComment(commentId, editCommentText.trim());
+      if (result.success) {
+        setEditingComment(null);
+        setEditCommentText('');
+        toast({
+          title: 'Commentaire modifié',
+          description: 'Le commentaire a été modifié avec succès.',
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de modifier le commentaire.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
+      try {
+        const result = await deleteComment(commentId);
+        if (result.success) {
+          toast({
+            title: 'Commentaire supprimé',
+            description: 'Le commentaire a été supprimé avec succès.',
+          });
+        } else {
+          throw new Error(result.error);
+        }
+      } catch (error) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de supprimer le commentaire.',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Add New Grade Form */}
@@ -147,6 +240,7 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
         {Object.entries(SUBJECTS).map(([subject, name]) => {
           const grades = student.grades[subject as Subject];
           const average = getSubjectAverage(subject as Subject);
+          const subjectComments = getCommentsBySubject(subject as Subject);
           
           return (
             <Card key={subject} className="border-0 shadow-soft">
@@ -166,46 +260,150 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                {grades.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Calendar className="w-6 h-6" />
+              <CardContent className="space-y-4">
+                {/* Grades Section */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Notes
+                  </h4>
+                  {grades.length === 0 ? (
+                    <div className="text-center py-4 text-muted-foreground bg-muted/30 rounded-lg">
+                      <p>Aucune note pour cette matière</p>
                     </div>
-                    <p>Aucune note pour cette matière</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {grades
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                      .map((grade) => (
-                        <div
-                          key={grade.id}
-                          className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          <div>
-                            <span className={`font-bold text-lg ${
-                              grade.value > 10 ? 'text-grade-excellent' : 
-                              grade.value >= 7 ? 'text-grade-good' : 'text-grade-poor'
-                            }`}>
-                              {grade.value}/20
-                            </span>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(grade.date)}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteGrade(subject as Subject, grade.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  ) : (
+                    <div className="space-y-2">
+                      {grades
+                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                        .map((grade) => (
+                          <div
+                            key={grade.id}
+                            className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
                           >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                            <div>
+                              <span className={`font-bold text-lg ${
+                                grade.value > 10 ? 'text-grade-excellent' : 
+                                grade.value >= 7 ? 'text-grade-good' : 'text-grade-poor'
+                              }`}>
+                                {grade.value}/20
+                              </span>
+                              <p className="text-sm text-muted-foreground">
+                                {formatDate(grade.date)}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteGrade(subject as Subject, grade.id)}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Comments Section */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4" />
+                    Commentaires
+                  </h4>
+                  
+                  {/* Add Comment Form */}
+                  <div className="space-y-2 mb-3">
+                    <Textarea
+                      placeholder={`Ajouter un commentaire pour ${name}...`}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      rows={2}
+                    />
+                    <Button
+                      onClick={() => handleAddComment(subject as Subject)}
+                      disabled={isAddingComment || !newComment.trim()}
+                      size="sm"
+                      className="w-full bg-gradient-primary hover:opacity-90"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      {isAddingComment ? 'Ajout...' : 'Ajouter un commentaire'}
+                    </Button>
+                  </div>
+
+                  {/* Comments List */}
+                  {subjectComments.length === 0 ? (
+                    <div className="text-center py-3 text-muted-foreground bg-muted/20 rounded-lg">
+                      <p className="text-sm">Aucun commentaire pour cette matière</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {subjectComments.map((comment) => (
+                        <div key={comment.id} className="p-3 bg-muted/20 rounded-lg">
+                          {editingComment === comment.id ? (
+                            <div className="space-y-2">
+                              <Textarea
+                                value={editCommentText}
+                                onChange={(e) => setEditCommentText(e.target.value)}
+                                rows={2}
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  onClick={() => handleUpdateComment(comment.id)}
+                                  size="sm"
+                                  className="bg-gradient-primary hover:opacity-90"
+                                >
+                                  <Save className="w-3 h-3 mr-1" />
+                                  Sauvegarder
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    setEditingComment(null);
+                                    setEditCommentText('');
+                                  }}
+                                  variant="outline"
+                                  size="sm"
+                                >
+                                  Annuler
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-sm mb-2">{comment.contenu}</p>
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs text-muted-foreground">
+                                  {formatDate(comment.created_at)}
+                                </p>
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setEditingComment(comment.id);
+                                      setEditCommentText(comment.contenu);
+                                    }}
+                                    className="h-6 w-6 p-0"
+                                  >
+                                    <Edit2 className="w-3 h-3" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleDeleteComment(comment.id)}
+                                    className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           );
