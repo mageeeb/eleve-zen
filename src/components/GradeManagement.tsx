@@ -320,13 +320,16 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
                   <div className="space-y-2 mb-3">
                     <Textarea
                       placeholder={`Ajouter un commentaire pour ${name}...`}
-                      value={newComments[subject] || ''}
-                      onChange={(e) => setNewComments(prev => ({ ...prev, [subject]: e.target.value }))}
+                      value={newComments[subject as string] || ''}
+                      onChange={(e) => {
+                        const subjectKey = subject as string;
+                        setNewComments(prev => ({ ...prev, [subjectKey]: e.target.value }));
+                      }}
                       rows={2}
                     />
                     <Button
                       onClick={() => handleAddComment(subject as Subject)}
-                      disabled={isAddingComment || !(newComments[subject] || '').trim()}
+                      disabled={isAddingComment || !(newComments[subject as string] || '').trim()}
                       size="sm"
                       className="w-full bg-gradient-primary hover:opacity-90"
                     >
