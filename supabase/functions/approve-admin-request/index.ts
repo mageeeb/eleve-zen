@@ -55,13 +55,7 @@ const handler = async (req: Request): Promise<Response> => {
         code_expires_at: expiresAt.toISOString()
       })
       .eq('id', requestId)
-      .select(`
-        *,
-        profiles!user_id (
-          email,
-          display_name
-        )
-      `)
+      .select('*')
       .single();
 
     if (updateError) {
@@ -76,7 +70,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         userEmail: updateData.email,
-        userName: updateData.profiles?.display_name || updateData.email,
+        userName: updateData.email,
         validationCode: validationCode
       })
     });
