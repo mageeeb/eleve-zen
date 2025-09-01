@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Student, Subject, SUBJECTS } from '@/types/Student';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import StudentForm from '@/components/StudentForm';
@@ -45,8 +46,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
   return (
     <>
       <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 overflow-y-auto">
-        <Card className="w-full sm:max-w-4xl min-h-screen sm:min-h-0 sm:max-h-[90vh] overflow-hidden shadow-strong rounded-none sm:rounded-2xl my-0 sm:my-4">
-          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white sticky top-0 z-10 p-3 sm:p-6 pb-4 sm:pb-6">
+        <Card className="w-full sm:max-w-4xl h-screen sm:h-[90vh] shadow-strong rounded-none sm:rounded-2xl my-0 sm:my-4 flex flex-col">
+          <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white p-3 sm:p-6 pb-4 sm:pb-6 flex-shrink-0">
             <CardTitle className="flex items-center gap-3">
               <Avatar className="h-12 w-12 sm:h-12 sm:w-12 ring-2 ring-white/20">
                 <AvatarImage src={student.avatar} alt={`${student.firstName} ${student.lastName}`} />
@@ -84,132 +85,142 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
             </div>
           </CardHeader>
           
-          <div className="overflow-y-auto flex-1">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-              <TabsList className="grid w-full grid-cols-3 bg-muted/50 sticky top-0 z-10 mx-0 rounded-none border-b p-1">
-                <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-                  <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Vue d'ensemble</span>
-                  <span className="sm:hidden">Vue</span>
-                </TabsTrigger>
-                <TabsTrigger value="grades" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-                  <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Gestion des notes</span>
-                  <span className="sm:hidden">Notes</span>
-                </TabsTrigger>
-                <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
-                  <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Statistiques</span>
-                  <span className="sm:hidden">Stats</span>
-                </TabsTrigger>
-              </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 overflow-hidden">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 mx-0 rounded-none border-b p-1 flex-shrink-0">
+              <TabsTrigger value="overview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Vue d'ensemble</span>
+                <span className="sm:hidden">Vue</span>
+              </TabsTrigger>
+              <TabsTrigger value="grades" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Gestion des notes</span>
+                <span className="sm:hidden">Notes</span>
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2">
+                <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Statistiques</span>
+                <span className="sm:hidden">Stats</span>
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="overview" className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto">
-                {/* General Average */}
-                <Card className="border-0 shadow-soft rounded-2xl">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="text-center">
-                      <h3 className="text-lg font-semibold mb-3 sm:mb-2">Moyenne générale</h3>
-                       <div className={`text-5xl sm:text-4xl font-bold mb-3 sm:mb-2 ${
-                         average > 10 ? 'text-grade-excellent' : 
-                         average > 5 ? 'text-grade-good' : 'text-grade-poor'
-                       }`}>
-                        {average.toFixed(1)}/20
+            <TabsContent value="overview" className="flex-1 overflow-hidden mt-0">
+              <ScrollArea className="h-full">
+                <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                  {/* General Average */}
+                  <Card className="border-0 shadow-soft rounded-2xl">
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="text-center">
+                        <h3 className="text-lg font-semibold mb-3 sm:mb-2">Moyenne générale</h3>
+                         <div className={`text-5xl sm:text-4xl font-bold mb-3 sm:mb-2 ${
+                           average > 10 ? 'text-grade-excellent' : 
+                           average > 5 ? 'text-grade-good' : 'text-grade-poor'
+                         }`}>
+                          {average.toFixed(1)}/20
+                        </div>
+                         <Badge 
+                           variant="outline" 
+                           className={`rounded-full ${
+                             average > 10 ? 'bg-grade-excellent/10 text-grade-excellent border-grade-excellent/20' : 
+                             average > 5 ? 'bg-grade-good/10 text-grade-good border-grade-good/20' : 
+                             'bg-grade-poor/10 text-grade-poor border-grade-poor/20'
+                           }`}
+                         >
+                          {average > 10 ? 'Excellent' : average >= 7 ? 'Bien' : 'À améliorer'}
+                        </Badge>
                       </div>
-                       <Badge 
-                         variant="outline" 
-                         className={`rounded-full ${
-                           average > 10 ? 'bg-grade-excellent/10 text-grade-excellent border-grade-excellent/20' : 
-                           average > 5 ? 'bg-grade-good/10 text-grade-good border-grade-good/20' : 
-                           'bg-grade-poor/10 text-grade-poor border-grade-poor/20'
-                         }`}
-                       >
-                        {average > 10 ? 'Excellent' : average >= 7 ? 'Bien' : 'À améliorer'}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Subject Averages */}
-                <Card className="border-0 shadow-soft rounded-2xl">
-                  <CardHeader className="p-4 sm:p-6">
-                    <CardTitle className="text-lg">Moyennes par matière</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 sm:p-6 pt-0">
-                    <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                      {Object.entries(SUBJECTS).map(([subject, name]) => {
-                        const subjectAverage = getSubjectAverage(subject as Subject);
-                        const subjectColorClass = getGradeColor(subjectAverage);
-                        const gradeCount = student.grades[subject as Subject].length;
-                        
-                        return (
-                          <div key={subject} className="flex items-center justify-between p-4 sm:p-3 bg-muted/30 rounded-xl sm:rounded-lg">
-                            <div>
-                              <p className="font-medium text-base sm:text-sm">{name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {gradeCount} note{gradeCount > 1 ? 's' : ''}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className={`font-bold text-lg sm:text-base ${
-                                gradeCount > 0 ? 
-                                  (subjectAverage > 10 ? 'text-grade-excellent' : 
-                                   subjectAverage > 5 ? 'text-grade-good' : 'text-grade-poor')
-                                  : 'text-muted-foreground'
-                              }`}>
-                                {gradeCount > 0 ? `${subjectAverage.toFixed(1)}/20` : 'N/A'}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Comments */}
-                {student.adminComments && (
-                  <Card className="border-0 shadow-soft">
-                    <CardHeader>
-                      <CardTitle>Commentaires de l'administrateur</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-foreground leading-relaxed bg-muted/30 p-4 rounded-lg">
-                        {student.adminComments}
-                      </p>
                     </CardContent>
                   </Card>
-                )}
 
-                {/* Student Info */}
-                <Card className="border-0 shadow-soft">
-                  <CardHeader>
-                    <CardTitle>Informations de l'élève</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Ajouté le</p>
-                        <p className="font-medium">{formatDate(student.createdAt)}</p>
+                  {/* Subject Averages */}
+                  <Card className="border-0 shadow-soft rounded-2xl">
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="text-lg">Moyennes par matière</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 sm:p-6 pt-0">
+                      <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                        {Object.entries(SUBJECTS).map(([subject, name]) => {
+                          const subjectAverage = getSubjectAverage(subject as Subject);
+                          const subjectColorClass = getGradeColor(subjectAverage);
+                          const gradeCount = student.grades[subject as Subject].length;
+                          
+                          return (
+                            <div key={subject} className="flex items-center justify-between p-4 sm:p-3 bg-muted/30 rounded-xl sm:rounded-lg">
+                              <div>
+                                <p className="font-medium text-base sm:text-sm">{name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {gradeCount} note{gradeCount > 1 ? 's' : ''}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className={`font-bold text-lg sm:text-base ${
+                                  gradeCount > 0 ? 
+                                    (subjectAverage > 10 ? 'text-grade-excellent' : 
+                                     subjectAverage > 5 ? 'text-grade-good' : 'text-grade-poor')
+                                    : 'text-muted-foreground'
+                                }`}>
+                                  {gradeCount > 0 ? `${subjectAverage.toFixed(1)}/20` : 'N/A'}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div>
-                        <p className="text-muted-foreground">Dernière modification</p>
-                        <p className="font-medium">{formatDate(student.updatedAt)}</p>
+                    </CardContent>
+                  </Card>
+
+                  {/* Comments */}
+                  {student.adminComments && (
+                    <Card className="border-0 shadow-soft">
+                      <CardHeader>
+                        <CardTitle>Commentaires de l'administrateur</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-foreground leading-relaxed bg-muted/30 p-4 rounded-lg">
+                          {student.adminComments}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Student Info */}
+                  <Card className="border-0 shadow-soft">
+                    <CardHeader>
+                      <CardTitle>Informations de l'élève</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Ajouté le</p>
+                          <p className="font-medium">{formatDate(student.createdAt)}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Dernière modification</p>
+                          <p className="font-medium">{formatDate(student.updatedAt)}</p>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                    </CardContent>
+                  </Card>
+                </div>
+              </ScrollArea>
+            </TabsContent>
 
-              <TabsContent value="grades" className="p-4 sm:p-6 overflow-y-auto">
-                <GradeManagement student={student} />
-              </TabsContent>
+            <TabsContent value="grades" className="flex-1 overflow-hidden mt-0">
+              <ScrollArea className="h-full">
+                <div className="p-4 sm:p-6">
+                  <GradeManagement student={student} />
+                </div>
+              </ScrollArea>
+            </TabsContent>
 
-              <TabsContent value="stats" className="p-4 sm:p-6 overflow-y-auto">
-                <GradeChart student={student} />
-              </TabsContent>
-            </Tabs>
-          </div>
+            <TabsContent value="stats" className="flex-1 overflow-hidden mt-0">
+              <ScrollArea className="h-full">
+                <div className="p-4 sm:p-6">
+                  <GradeChart student={student} />
+                </div>
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
         </Card>
       </div>
 
