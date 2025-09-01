@@ -110,13 +110,20 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                   <CardContent className="p-4 sm:p-6">
                     <div className="text-center">
                       <h3 className="text-lg font-semibold mb-3 sm:mb-2">Moyenne générale</h3>
-                      <div className={`text-5xl sm:text-4xl font-bold text-${gradeColorClass} mb-3 sm:mb-2`}>
+                       <div className={`text-5xl sm:text-4xl font-bold mb-3 sm:mb-2 ${
+                         average > 10 ? 'text-grade-excellent' : 
+                         average > 5 ? 'text-grade-good' : 'text-grade-poor'
+                       }`}>
                         {average.toFixed(1)}/20
                       </div>
-                      <Badge 
-                        variant="outline" 
-                        className={`bg-${gradeColorClass}/10 text-${gradeColorClass} border-${gradeColorClass}/20 rounded-full`}
-                      >
+                       <Badge 
+                         variant="outline" 
+                         className={`rounded-full ${
+                           average > 10 ? 'bg-grade-excellent/10 text-grade-excellent border-grade-excellent/20' : 
+                           average > 5 ? 'bg-grade-good/10 text-grade-good border-grade-good/20' : 
+                           'bg-grade-poor/10 text-grade-poor border-grade-poor/20'
+                         }`}
+                       >
                         {average > 10 ? 'Excellent' : average >= 7 ? 'Bien' : 'À améliorer'}
                       </Badge>
                     </div>
@@ -144,7 +151,12 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className={`font-bold text-lg sm:text-base text-${subjectColorClass}`}>
+                              <p className={`font-bold text-lg sm:text-base ${
+                                gradeCount > 0 ? 
+                                  (subjectAverage > 10 ? 'text-grade-excellent' : 
+                                   subjectAverage > 5 ? 'text-grade-good' : 'text-grade-poor')
+                                  : 'text-muted-foreground'
+                              }`}>
                                 {gradeCount > 0 ? `${subjectAverage.toFixed(1)}/20` : 'N/A'}
                               </p>
                             </div>

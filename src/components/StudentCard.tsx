@@ -73,12 +73,19 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
             <div className="text-center p-4 sm:p-3 rounded-2xl sm:rounded-lg bg-gradient-to-br from-muted/50 to-muted/30 shadow-inner">
               <p className="text-sm text-muted-foreground mb-2 sm:mb-1 font-medium">Moyenne générale</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-                <span className={`text-3xl sm:text-2xl font-bold text-${gradeColorClass} tracking-tight`}>
+                <span className={`text-3xl sm:text-2xl font-bold tracking-tight ${
+                  average > 10 ? 'text-grade-excellent' : 
+                  average > 5 ? 'text-grade-good' : 'text-grade-poor'
+                }`}>
                   {average.toFixed(1)}/20
                 </span>
                 <Badge 
                   variant="outline" 
-                  className={`bg-${gradeColorClass}/10 text-${gradeColorClass} border-${gradeColorClass}/20 rounded-full font-medium`}
+                  className={`rounded-full font-medium ${
+                    average > 10 ? 'bg-grade-excellent/10 text-grade-excellent border-grade-excellent/20' : 
+                    average > 5 ? 'bg-grade-good/10 text-grade-good border-grade-good/20' : 
+                    'bg-grade-poor/10 text-grade-poor border-grade-poor/20'
+                  }`}
                 >
                   {getGradeText(average)}
                 </Badge>
@@ -101,8 +108,14 @@ const StudentCard: React.FC<StudentCardProps> = ({ student: initialStudent }) =>
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
                   setShowDetail(true);
+                  // Scroll après l'ouverture du modal
+                  setTimeout(() => {
+                    const modal = document.querySelector('[class*="fixed inset-0"]');
+                    if (modal) {
+                      modal.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }, 100);
                 }}
                 className="flex-1 hover:bg-primary hover:text-primary-foreground transition-all h-10 sm:h-9 rounded-xl font-medium shadow-sm"
               >
