@@ -6,89 +6,80 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const handler = async (req: Request): Promise<Response> => {
-  console.log("=== DEBUT approve-admin-request ===");
+serve(async (req: Request) => {
+  console.log("🚀 Function called:", req.method);
 
   if (req.method === "OPTIONS") {
-    console.log("Handling OPTIONS request");
+    console.log("✅ OPTIONS request");
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    console.log("Creating Supabase client...");
-    const supabase = createClient(
-      "https://cfvuitpoiymeqblmlijy.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmdnVpdHBvaXltZXFibG1saWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc3NzMsImV4cCI6MjA2OTM1Mzc3M30._qSS6Nn5IfUgE2KxqUINJ8xJHGTfx6PhUjMqkJy34wI"
-    );
+  if (req.method !== "POST") {
+    console.log("❌ Method not allowed:", req.method);
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
 
-    console.log("Parsing request body...");
-    const body = await req.json();
-    console.log("Request body:", body);
-    
-    const requestId = body.requestId;
+  try {
+    console.log("📥 Parsing body...");
+    const { requestId } = await req.json();
+    console.log("📋 RequestId:", requestId);
+
     if (!requestId) {
-      console.error("No requestId provided");
-      return new Response(JSON.stringify({ error: "requestId is required" }), {
+      console.log("❌ Missing requestId");
+      return new Response(JSON.stringify({ error: "requestId required" }), {
         status: 400,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("Processing request ID:", requestId);
+    console.log("🔌 Creating Supabase client...");
+    const supabase = createClient(
+      "https://cfvuitpoiymeqblmlijy.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmdnVpdHBvaXltZXFibG1saWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc3NzMsImV4cCI6MjA2OTM1Mzc3M30._qSS6Nn5IfUgE2KxqUINJ8xJHGTfx6PhUjMqkJy34wI"
+    );
 
-    // Générer code de validation
-    const validationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
-    
-    console.log("Generated validation code:", validationCode);
-    console.log("Expires at:", expiresAt.toISOString());
+    // Code de validation simple
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-    // Mettre à jour la demande
-    console.log("Updating admin request...");
+    console.log("💾 Updating request with code:", code);
+
     const { data, error } = await supabase
       .from('admin_requests')
       .update({
         status: 'approved',
-        validation_code: validationCode,
-        code_expires_at: expiresAt.toISOString()
+        validation_code: code,
+        code_expires_at: expires
       })
-      .eq('id', requestId)
-      .select('*')
-      .single();
+      .eq('id', requestId);
 
     if (error) {
-      console.error("Database error:", error);
+      console.error("❌ Database error:", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("Update successful:", data);
-
+    console.log("✅ Success!");
+    
     return new Response(JSON.stringify({
       success: true,
-      message: 'Admin request approved',
-      data: data
+      message: 'Request approved',
+      code: code
     }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
 
   } catch (error: any) {
-    console.error("=== ERREUR GENERALE ===", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error("💥 Catch error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
-};
-
-serve(handler);
+});
