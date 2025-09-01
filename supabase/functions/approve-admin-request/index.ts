@@ -63,7 +63,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Envoyer le code de validation par email
-    const sendCodeResponse = await fetch(`${req.url.replace('/approve-admin-request', '/send-validation-code')}`, {
+    const sendCodeResponse = await fetch('https://cfvuitpoiymeqblmlijy.supabase.co/functions/v1/send-validation-code', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
