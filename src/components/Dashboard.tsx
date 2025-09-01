@@ -11,7 +11,8 @@ import StudentForm from '@/components/StudentForm';
 import { UserAvatar } from '@/components/UserAvatar';
 import { ProfileEdit } from '@/components/ProfileEdit';
 import AdminValidation from '@/components/AdminValidation';
-import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown, User, Shield } from 'lucide-react';
+import { AdminPanel } from '@/components/AdminPanel';
+import { LogOut, Plus, Search, Users, GraduationCap, ChevronDown, User, Shield, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
@@ -24,6 +25,10 @@ const Dashboard = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showAdminValidation, setShowAdminValidation] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+
+  // Vérifier si l'utilisateur est le super admin
+  const isSuperAdmin = user?.email === 'nanouchkaly@yahoo.fr';
 
   const handleLogout = async () => {
     await logout();
@@ -117,6 +122,15 @@ const Dashboard = () => {
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       Devenir admin
+                    </DropdownMenuItem>
+                  )}
+                  {isSuperAdmin && (
+                    <DropdownMenuItem 
+                      onClick={() => setShowAdminPanel(true)}
+                      className="cursor-pointer text-purple-600 focus:text-purple-700"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Panneau Admin
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
@@ -248,6 +262,23 @@ const Dashboard = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowAdminValidation(false)}
+                className="absolute -top-2 -right-2 bg-white rounded-full w-8 h-8 p-0 shadow-md hover:bg-gray-100"
+              >
+                ✕
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Admin Panel Modal */}
+        {showAdminPanel && isSuperAdmin && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="relative max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+              <AdminPanel />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdminPanel(false)}
                 className="absolute -top-2 -right-2 bg-white rounded-full w-8 h-8 p-0 shadow-md hover:bg-gray-100"
               >
                 ✕
