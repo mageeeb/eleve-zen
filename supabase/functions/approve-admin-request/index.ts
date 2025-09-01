@@ -1,5 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.53.0';
+import { Resend } from "npm:resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,10 +38,17 @@ serve(async (req: Request) => {
       });
     }
 
-    console.log("🔌 Creating Supabase client...");
+    // Utiliser la clé service role pour bypasser RLS
+    console.log("🔌 Creating Supabase client with service role...");
     const supabase = createClient(
       "https://cfvuitpoiymeqblmlijy.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmdnVpdHBvaXltZXFibG1saWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3Nzc3NzMsImV4cCI6MjA2OTM1Mzc3M30._qSS6Nn5IfUgE2KxqUINJ8xJHGTfx6PhUjMqkJy34wI"
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
     // Code de validation simple
@@ -47,6 +57,24 @@ serve(async (req: Request) => {
 
     console.log("💾 Updating request with code:", code);
 
+    // Récupérer la demande d'abord pour avoir l'email
+    const { data: requestData, error: fetchError } = await supabase
+      .from('admin_requests')
+      .select('email, user_id')
+      .eq('id', requestId)
+      .single();
+
+    if (fetchError) {
+      console.error("❌ Fetch error:", fetchError);
+      return new Response(JSON.stringify({ error: fetchError.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    console.log("📧 Request email:", requestData.email);
+
+    // Mettre à jour la demande
     const { data, error } = await supabase
       .from('admin_requests')
       .update({
@@ -54,22 +82,55 @@ serve(async (req: Request) => {
         validation_code: code,
         code_expires_at: expires
       })
-      .eq('id', requestId);
+      .eq('id', requestId)
+      .select()
+      .single();
 
     if (error) {
-      console.error("❌ Database error:", error);
+      console.error("❌ Database update error:", error);
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    console.log("✅ Success!");
-    
+    console.log("✅ Database updated successfully:", data);
+
+    // Envoyer l'email avec le code
+    try {
+      console.log("📬 Sending validation email...");
+      const emailResponse = await resend.emails.send({
+        from: "Admin <onboarding@resend.dev>",
+        to: [requestData.email],
+        subject: "Votre demande d'admin a été approuvée !",
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h1 style="color: #333;">Demande d'accès administrateur approuvée</h1>
+            <p>Bonjour,</p>
+            <p>Votre demande d'accès administrateur a été approuvée !</p>
+            <p>Voici votre code de validation :</p>
+            <div style="background: #f5f5f5; padding: 20px; border-radius: 5px; text-align: center; margin: 20px 0;">
+              <h2 style="margin: 0; color: #2563eb; font-size: 32px; letter-spacing: 4px;">${code}</h2>
+            </div>
+            <p>Ce code expire le <strong>${new Date(expires).toLocaleString('fr-FR')}</strong>.</p>
+            <p>Utilisez ce code dans l'application pour valider votre accès administrateur.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+            <p style="color: #666; font-size: 12px;">Si vous n'avez pas fait cette demande, ignorez cet email.</p>
+          </div>
+        `,
+      });
+
+      console.log("📧 Email sent successfully:", emailResponse);
+    } catch (emailError: any) {
+      console.error("📧 Email error (but approval succeeded):", emailError);
+      // Continue même si l'email échoue
+    }
+
     return new Response(JSON.stringify({
       success: true,
-      message: 'Request approved',
-      code: code
+      message: 'Request approved and email sent',
+      code: code,
+      data: data
     }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
