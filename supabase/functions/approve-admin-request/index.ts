@@ -30,18 +30,18 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    const { requestId }: ApproveRequestData = await req.json();
+    const { requestId } = await req.json();
     
     console.log("Approving admin request:", requestId);
 
     // Générer un code de validation simple
     const validationCode = Math.random().toString(36).substring(2, 8).toUpperCase();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24); // Code valide 24h
+    expiresAt.setHours(expiresAt.getHours() + 24);
 
     console.log("Generated validation code:", validationCode);
 
-    // Mettre à jour la demande avec le code et l'expiration
+    // Mettre à jour la demande - version simple
     const { data: updateData, error: updateError } = await supabase
       .from('admin_requests')
       .update({
@@ -55,40 +55,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (updateError) {
       console.error("Update error:", updateError);
-      throw new Error(`Failed to update admin request: ${updateError.message}`);
-    }
-
-    console.log("Admin request updated:", updateData);
-
-    // Envoyer le code de validation par email
-    try {
-      const sendCodeResponse = await fetch('https://cfvuitpoiymeqblmlijy.supabase.co/functions/v1/send-validation-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userEmail: updateData.email,
-          userName: updateData.email,
-          validationCode: validationCode
-        })
+      return new Response(JSON.stringify({ 
+        error: `Failed to update admin request: ${updateError.message}` 
+      }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       });
-
-      if (!sendCodeResponse.ok) {
-        console.error('Failed to send validation code email, status:', sendCodeResponse.status);
-      } else {
-        console.log('Validation code email sent successfully');
-      }
-    } catch (emailError) {
-      console.error('Error sending email:', emailError);
-      // Ne pas faire échouer toute la fonction si l'email échoue
     }
 
-    console.log("Admin request approved and code sent:", updateData);
+    console.log("Admin request updated successfully:", updateData);
 
     return new Response(JSON.stringify({
       success: true,
-      message: 'Admin request approved and validation code sent',
+      message: 'Admin request approved',
       data: updateData
     }), {
       status: 200,
