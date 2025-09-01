@@ -15,6 +15,68 @@ export const useSupabaseStudents = () => {
     }
   }, [isAuthenticated]);
 
+  // Mise à jour en temps réel avec Supabase Realtime
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const channel = supabase
+      .channel('students-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'eleves'
+      }, () => {
+        console.log('🔄 Nouvel étudiant ajouté, actualisation...');
+        fetchStudents();
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE', 
+        schema: 'public',
+        table: 'eleves'
+      }, () => {
+        console.log('🔄 Étudiant modifié, actualisation...');
+        fetchStudents();
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public', 
+        table: 'eleves'
+      }, () => {
+        console.log('🔄 Étudiant supprimé, actualisation...');
+        fetchStudents();
+      })
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notes'
+      }, () => {
+        console.log('🔄 Note ajoutée, actualisation...');
+        fetchStudents();
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'notes'
+      }, () => {
+        console.log('🔄 Note modifiée, actualisation...');
+        fetchStudents();
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'notes'
+      }, () => {
+        console.log('🔄 Note supprimée, actualisation...');
+        fetchStudents();
+      })
+      .subscribe();
+
+    return () => {
+      console.log('🔌 Déconnexion realtime');
+      supabase.removeChannel(channel);
+    };
+  }, [isAuthenticated]);
+
   const fetchStudents = async () => {
     try {
       console.log('📥 DEBUT fetchStudents - récupération depuis la BDD...');

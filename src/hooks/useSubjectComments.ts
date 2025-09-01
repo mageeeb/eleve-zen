@@ -149,6 +149,46 @@ export const useSubjectComments = (studentId: string) => {
     }
   }, [studentId]);
 
+  // Mise à jour en temps réel pour les commentaires
+  useEffect(() => {
+    if (!studentId) return;
+
+    const channel = supabase
+      .channel(`comments-${studentId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'commentaires',
+        filter: `eleve_id=eq.${studentId}`
+      }, () => {
+        console.log('🔄 Commentaire ajouté, actualisation...');
+        fetchComments();
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'commentaires',
+        filter: `eleve_id=eq.${studentId}`
+      }, () => {
+        console.log('🔄 Commentaire modifié, actualisation...');
+        fetchComments();
+      })
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'commentaires',
+        filter: `eleve_id=eq.${studentId}`
+      }, () => {
+        console.log('🔄 Commentaire supprimé, actualisation...');
+        fetchComments();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [studentId]);
+
   return {
     comments,
     loading,
