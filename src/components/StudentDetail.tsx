@@ -44,8 +44,8 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-        <Card className="w-full sm:max-w-4xl h-[100vh] sm:h-auto sm:max-h-[90vh] overflow-hidden shadow-strong rounded-none sm:rounded-2xl">
+      <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50 overflow-y-auto">
+        <Card className="w-full sm:max-w-4xl min-h-screen sm:min-h-0 sm:max-h-[90vh] overflow-hidden shadow-strong rounded-none sm:rounded-2xl my-0 sm:my-4">
           <CardHeader className="flex flex-row items-center justify-between bg-gradient-primary text-white sticky top-0 z-10 p-3 sm:p-6 pb-4 sm:pb-6">
             <CardTitle className="flex items-center gap-3">
               <Avatar className="h-12 w-12 sm:h-12 sm:w-12 ring-2 ring-white/20">

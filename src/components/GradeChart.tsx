@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Student, Subject, SUBJECTS, SUBJECT_COLORS } from '@/types/Student';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Cell } from 'recharts';
 
 interface GradeChartProps {
   student: Student;
@@ -18,12 +18,19 @@ const GradeChart: React.FC<GradeChartProps> = ({ student }) => {
   };
 
   // Data for bar chart
-  const barChartData = Object.entries(SUBJECTS).map(([subject, name]) => ({
-    subject: name,
-    average: getSubjectAverage(subject as Subject),
-    gradeCount: student.grades[subject as Subject].length,
-    color: SUBJECT_COLORS[subject as Subject]
-  }));
+  const barChartData = Object.entries(SUBJECTS).map(([subject, name]) => {
+    const average = getSubjectAverage(subject as Subject);
+    const gradeCount = student.grades[subject as Subject].length;
+    
+    return {
+      subject: name,
+      average: average,
+      gradeCount: gradeCount,
+      color: average > 10 ? 'hsl(var(--grade-excellent))' : 
+             average > 5 ? 'hsl(var(--grade-good))' : 
+             'hsl(var(--grade-poor))'
+    };
+  });
 
   // Data for radar chart
   const radarChartData = Object.entries(SUBJECTS).map(([subject, name]) => ({
@@ -106,8 +113,11 @@ const GradeChart: React.FC<GradeChartProps> = ({ student }) => {
               <Bar 
                 dataKey="average" 
                 radius={[4, 4, 0, 0]}
-                fill="hsl(var(--primary))"
-              />
+              >
+                {barChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
