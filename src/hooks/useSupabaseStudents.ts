@@ -17,16 +17,21 @@ export const useSupabaseStudents = () => {
 
   const fetchStudents = async () => {
     try {
+      console.log('📥 DEBUT fetchStudents - récupération depuis la BDD...');
       setLoading(true);
+      
       const { data, error } = await supabase
         .from('eleves')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching students:', error);
+        console.error('❌ Erreur fetchStudents:', error);
         return;
       }
+
+      console.log('📋 Données reçues de la BDD:', data?.length, 'étudiants');
+      console.log('📋 IDs des étudiants:', data?.map(s => s.id));
 
       // Transform Supabase data to our Student interface
       const transformedStudents: Student[] = data?.map(student => ({
@@ -49,14 +54,18 @@ export const useSupabaseStudents = () => {
         updatedAt: student.created_at
       })) || [];
 
+      console.log('🔄 Étudiants transformés:', transformedStudents.length);
+
       // Fetch grades for each student
       for (const student of transformedStudents) {
         await fetchGradesForStudent(student);
       }
 
+      console.log('✅ Mise à jour du state avec', transformedStudents.length, 'étudiants');
       setStudents(transformedStudents);
+      console.log('🏁 FIN fetchStudents - state mis à jour');
     } catch (error) {
-      console.error('Error in fetchStudents:', error);
+      console.error('💥 Erreur dans fetchStudents:', error);
     } finally {
       setLoading(false);
     }
@@ -213,10 +222,10 @@ export const useSupabaseStudents = () => {
 
       console.log('✅ Student deleted successfully from database');
       
-      // Force refresh from database
       console.log('🔄 Rafraîchissement de la liste...');
       await fetchStudents();
       console.log('🔄 Refreshed students list from database');
+      console.log('📊 Nombre d\'étudiants après suppression:', students.length);
       
     } catch (error) {
       console.error('💥 Error in deleteStudent:', error);
