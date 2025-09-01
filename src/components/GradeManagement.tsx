@@ -26,7 +26,7 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
   const [selectedSubject, setSelectedSubject] = useState<Subject>('javascript');
   const [newGradeValue, setNewGradeValue] = useState<string>('');
   const [isAdding, setIsAdding] = useState(false);
-  const [newComment, setNewComment] = useState<string>('');
+  const [newComments, setNewComments] = useState<Record<string, string>>({});
   const [isAddingComment, setIsAddingComment] = useState(false);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editCommentText, setEditCommentText] = useState<string>('');
@@ -97,7 +97,10 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
   };
 
   const handleAddComment = async (subject: Subject) => {
-    if (!newComment.trim()) {
+    const subjectKey = subject as string;
+    const commentText = newComments[subjectKey] || '';
+    
+    if (!commentText.trim()) {
       toast({
         title: 'Erreur',
         description: 'Veuillez entrer un commentaire.',
@@ -108,9 +111,9 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
 
     setIsAddingComment(true);
     try {
-      const result = await addComment(subject, newComment.trim());
+      const result = await addComment(subject, commentText.trim());
       if (result.success) {
-        setNewComment('');
+        setNewComments(prev => ({ ...prev, [subjectKey]: '' }));
         toast({
           title: 'Commentaire ajouté',
           description: `Commentaire ajouté pour ${SUBJECTS[subject]}.`,
@@ -317,13 +320,13 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
                   <div className="space-y-2 mb-3">
                     <Textarea
                       placeholder={`Ajouter un commentaire pour ${name}...`}
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      value={newComments[subject] || ''}
+                      onChange={(e) => setNewComments(prev => ({ ...prev, [subject]: e.target.value }))}
                       rows={2}
                     />
                     <Button
                       onClick={() => handleAddComment(subject as Subject)}
-                      disabled={isAddingComment || !newComment.trim()}
+                      disabled={isAddingComment || !(newComments[subject] || '').trim()}
                       size="sm"
                       className="w-full bg-gradient-primary hover:opacity-90"
                     >
