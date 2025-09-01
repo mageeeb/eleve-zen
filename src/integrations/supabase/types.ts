@@ -51,6 +51,7 @@ export type Database = {
         Row: {
           contenu: string
           created_at: string | null
+          created_by: string | null
           eleve_id: string | null
           id: string
           matiere: string | null
@@ -58,6 +59,7 @@ export type Database = {
         Insert: {
           contenu: string
           created_at?: string | null
+          created_by?: string | null
           eleve_id?: string | null
           id?: string
           matiere?: string | null
@@ -65,6 +67,7 @@ export type Database = {
         Update: {
           contenu?: string
           created_at?: string | null
+          created_by?: string | null
           eleve_id?: string | null
           id?: string
           matiere?: string | null

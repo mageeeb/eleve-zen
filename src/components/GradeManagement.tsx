@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Student, Subject, SUBJECTS, Grade } from '@/types/Student';
 import { useSupabaseStudents } from '@/hooks/useSupabaseStudents';
 import { useSubjectComments } from '@/hooks/useSubjectComments';
+import { UserAvatar } from '@/components/UserAvatar';
 import { Plus, Trash2, Save, Calendar, MessageCircle, Edit2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -368,37 +369,49 @@ const GradeManagement: React.FC<GradeManagementProps> = ({ student: initialStude
                                 </Button>
                               </div>
                             </div>
-                          ) : (
-                            <div>
-                              <p className="text-sm mb-2">{comment.contenu}</p>
-                              <div className="flex items-center justify-between">
-                                <p className="text-xs text-muted-foreground">
-                                  {formatDate(comment.created_at)}
-                                </p>
-                                <div className="flex gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setEditingComment(comment.id);
-                                      setEditCommentText(comment.contenu);
-                                    }}
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Edit2 className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleDeleteComment(comment.id)}
-                                    className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
+                           ) : (
+                             <div>
+                               <div className="flex items-start gap-3 mb-2">
+                                 <UserAvatar 
+                                   avatarUrl={comment.user_avatar}
+                                   displayName={comment.user_name}
+                                   size="sm"
+                                 />
+                                 <div className="flex-1">
+                                   <p className="text-sm font-medium mb-1">
+                                     {comment.user_name}
+                                   </p>
+                                   <p className="text-sm text-muted-foreground">{comment.contenu}</p>
+                                 </div>
+                               </div>
+                               <div className="flex items-center justify-between ml-11">
+                                 <p className="text-xs text-muted-foreground">
+                                   {formatDate(comment.created_at)}
+                                 </p>
+                                 <div className="flex gap-1">
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => {
+                                       setEditingComment(comment.id);
+                                       setEditCommentText(comment.contenu);
+                                     }}
+                                     className="h-6 w-6 p-0"
+                                   >
+                                     <Edit2 className="w-3 h-3" />
+                                   </Button>
+                                   <Button
+                                     variant="ghost"
+                                     size="sm"
+                                     onClick={() => handleDeleteComment(comment.id)}
+                                     className="h-6 w-6 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                   >
+                                     <Trash2 className="w-3 h-3" />
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+                           )}
                         </div>
                       ))}
                     </div>

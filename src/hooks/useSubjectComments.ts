@@ -8,6 +8,9 @@ export interface SubjectComment {
   matiere: string;
   eleve_id: string;
   created_at: string;
+  created_by?: string;
+  user_name?: string;
+  user_avatar?: string;
 }
 
 export const useSubjectComments = (studentId: string) => {
@@ -25,7 +28,32 @@ export const useSubjectComments = (studentId: string) => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setComments(data || []);
+
+      // Fetch user profiles for each comment
+      const commentsWithUserInfo = await Promise.all(
+        (data || []).map(async (comment) => {
+          if (comment.created_by) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('display_name, avatar_url, email')
+              .eq('id', comment.created_by)
+              .single();
+
+            return {
+              ...comment,
+              user_name: profile?.display_name || profile?.email || 'Utilisateur inconnu',
+              user_avatar: profile?.avatar_url
+            };
+          }
+          return {
+            ...comment,
+            user_name: 'Utilisateur inconnu',
+            user_avatar: null
+          };
+        })
+      );
+
+      setComments(commentsWithUserInfo);
     } catch (error) {
       console.error('Error fetching subject comments:', error);
     } finally {
@@ -35,19 +63,35 @@ export const useSubjectComments = (studentId: string) => {
 
   const addComment = async (subject: Subject, content: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
       const { data, error } = await supabase
         .from('commentaires')
         .insert({
+          contenu: content,
+          matiere: subject as string,
           eleve_id: studentId,
-          matiere: subject,
-          contenu: content
+          created_by: user?.id,
         })
         .select()
         .single();
 
       if (error) throw error;
       
-      setComments(prev => [data, ...prev]);
+      // Add user info to the new comment
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, avatar_url, email')
+        .eq('id', user?.id)
+        .single();
+
+      const commentWithUserInfo = {
+        ...data,
+        user_name: profile?.display_name || profile?.email || 'Utilisateur inconnu',
+        user_avatar: profile?.avatar_url
+      };
+      
+      setComments(prev => [commentWithUserInfo, ...prev]);
       return { success: true };
     } catch (error) {
       console.error('Error adding comment:', error);
