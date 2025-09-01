@@ -120,7 +120,6 @@ const StudentForm: React.FC<StudentFormProps> = ({ student, onClose, onSuccess }
                   id="age"
                   type="number"
                   min="16"
-                  max="30"
                   value={formData.age}
                   onChange={(e) => handleChange('age', parseInt(e.target.value))}
                   required
