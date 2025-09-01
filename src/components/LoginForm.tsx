@@ -177,9 +177,9 @@ const LoginForm = () => {
                       Formation
                     </Label>
                     <Input
-                      id="formation"
+                      id="formateur du secteur"
                       type="text"
-                      placeholder="Ex: Développement Web, Data Science..."
+                      placeholder="Ex: Web, DD, Réseaux..."
                       value={formation}
                       onChange={(e) => setFormation(e.target.value)}
                       required
