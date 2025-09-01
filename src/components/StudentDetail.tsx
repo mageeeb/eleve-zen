@@ -104,7 +104,7 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1">
+              <TabsContent value="overview" className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto">
                 {/* General Average */}
                 <Card className="border-0 shadow-soft rounded-2xl">
                   <CardContent className="p-4 sm:p-6">
@@ -201,11 +201,11 @@ const StudentDetail: React.FC<StudentDetailProps> = ({ student: initialStudent, 
                 </Card>
               </TabsContent>
 
-              <TabsContent value="grades" className="p-4 sm:p-6 flex-1">
+              <TabsContent value="grades" className="p-4 sm:p-6 overflow-y-auto">
                 <GradeManagement student={student} />
               </TabsContent>
 
-              <TabsContent value="stats" className="p-4 sm:p-6 flex-1">
+              <TabsContent value="stats" className="p-4 sm:p-6 overflow-y-auto">
                 <GradeChart student={student} />
               </TabsContent>
             </Tabs>
