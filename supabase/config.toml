@@ -1,10 +1,1 @@
-project_id = "cfvuitpoiymeqblmlijy"
-
-[functions.send-admin-notification]
-verify_jwt = false
-
-[functions.send-validation-code]
-verify_jwt = false
-
-[functions.approve-admin-request]
-verify_jwt = false
+project_id = "rbytdpxwlfufsnnvxgqw"
