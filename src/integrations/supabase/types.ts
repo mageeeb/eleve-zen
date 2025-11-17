@@ -14,16 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_requests: {
+        Row: {
+          code_expires_at: string | null
+          created_at: string | null
+          id: string
+          status: string
+          updated_at: string | null
+          user_id: string
+          validation_code: string | null
+        }
+        Insert: {
+          code_expires_at?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+          validation_code?: string | null
+        }
+        Update: {
+          code_expires_at?: string | null
+          created_at?: string | null
+          id?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          validation_code?: string | null
+        }
+        Relationships: []
+      }
+      grades: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          id: string
+          student_id: string
+          subject: string
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          student_id: string
+          subject: string
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          student_id?: string
+          subject?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grades_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          email: string
+          formation: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email: string
+          formation?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          email?: string
+          formation?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          admin_comments: string | null
+          age: number
+          avatar: string | null
+          class_name: string | null
+          created_at: string | null
+          first_name: string
+          gender: string | null
+          id: string
+          last_name: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_comments?: string | null
+          age: number
+          avatar?: string | null
+          class_name?: string | null
+          created_at?: string | null
+          first_name: string
+          gender?: string | null
+          id?: string
+          last_name: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_comments?: string | null
+          age?: number
+          avatar?: string | null
+          class_name?: string | null
+          created_at?: string | null
+          first_name?: string
+          gender?: string | null
+          id?: string
+          last_name?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin_or_super: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +317,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "user"],
+    },
   },
 } as const
